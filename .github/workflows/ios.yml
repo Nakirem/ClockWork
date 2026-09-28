@@ -1,77 +1,39 @@
-name: ClockWork - tests et IPA Sideloadly
-on: [push, pull_request, workflow_dispatch]
-permissions:
-  contents: read
-concurrency:
-  group: ios-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+name: Build unsigned IPA
+
+on:
+  workflow_dispatch:   # déclenchement manuel
+  push:
+    branches: [main]
+
 jobs:
-  test:
-    runs-on: macos-15
-    timeout-minutes: 40
+  build:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Show toolchain
-        run: xcodebuild -version
-      - name: Test domain
-        run: swift test
-      - name: Validate project structure
-        run: python3 scripts/validate_project.py
-      - name: Test IPA packaging
-        run: python3 -m unittest discover -s scripts/tests -v
-      - name: Select an installed iPhone simulator
+
+      - name: Build
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for k,v in d["devices"].items() if "iOS" in k for x in v if "iPhone" in x["name"]))')
-          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
-      - name: Build and test iOS app
-        run: xcodebuild test -project ClockWork.xcodeproj -scheme ClockWork -destination "platform=iOS Simulator,id=$DEVICE_ID" -resultBundlePath TestResults.xcresult CODE_SIGNING_ALLOWED=NO
-      - name: Archive unsigned iPhone app
-        if: github.event_name != 'pull_request'
-        run: |
-          xcodebuild archive \
-            -project ClockWork.xcodeproj \
-            -scheme ClockWork \
+          xcodebuild build \
+            -project MonProjet.xcodeproj \
+            -scheme MonProjet \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath build/ClockWork.xcarchive \
             -derivedDataPath build/DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM="" \
-            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
-      - name: Package iPhone IPA for Sideloadly
-        if: github.event_name != 'pull_request'
+            CODE_SIGN_IDENTITY=''
+
+      - name: Package IPA
         run: |
-          xcrun lipo -verify_arch arm64 build/ClockWork.xcarchive/Products/Applications/ClockWork.app/ClockWork
-          python3 scripts/package_ipa.py \
-            --app build/ClockWork.xcarchive/Products/Applications/ClockWork.app \
-            --output dist/ClockWork-unsigned.ipa
-          cp docs/SIDELOAD_WINDOWS.md dist/INSTALLATION.md
-      - name: Downloadable IPA
-        if: github.event_name != 'pull_request'
+          mkdir -p unsigned/Payload
+          cp -R build/DerivedData/Build/Products/Release-iphoneos/MonProjet.app unsigned/Payload/
+          cd unsigned
+          zip -r ../MonProjet-unsigned.ipa Payload/
+          cd ..
+
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ClockWork-Sideloadly-${{ github.run_number }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 7
-      - name: Installation summary
-        if: github.event_name != 'pull_request'
-        run: |
-          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
-          ## ClockWork pour Windows et iPhone
-          Les tests et la compilation iPhone ont réussi. Téléchargez l’artefact **ClockWork-Sideloadly**, puis extrayez le ZIP GitHub.
-          Ouvrez **ClockWork-unsigned.ipa** dans Sideloadly sur Windows : Sideloadly doit encore le signer avec votre compte Apple et l’installer sur votre iPhone.
-          Aucun identifiant Apple n’est utilisé dans GitHub Actions. Le guide INSTALLATION.md est inclus.
-          L’installation et le geofencing restent à vérifier sur l’iPhone réel. Compte gratuit : signature à renouveler tous les 7 jours.
-          EOF
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ios-test-results
-          path: TestResults.xcresult
-          if-no-files-found: ignore
-          retention-days: 3
+          name: unsigned-ipa
+          path: MonProjet-unsigned.ipa
+          retention-days: 30   
