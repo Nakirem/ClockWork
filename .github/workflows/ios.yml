@@ -45,7 +45,7 @@ jobs:
       - name: Package iPhone IPA for Sideloadly
         if: github.event_name != 'pull_request'
         run: |
-          xcrun lipo -verify_arch arm64 build/ClockWork.xcarchive/Products/Applications/ClockWork.app/ClockWork
+          xcrun lipo build/ClockWork.xcarchive/Products/Applications/ClockWork.app/ClockWork -verify_arch arm64
           python3 scripts/package_ipa.py \
             --app build/ClockWork.xcarchive/Products/Applications/ClockWork.app \
             --output dist/ClockWork-unsigned.ipa
