@@ -21,10 +21,9 @@
       "versions": [
         {
           "version": "1.0",
-          "date": "2026-10-02T00:00:00Z",
-          "localizedDescription": "Première publication. La taille et la date réelles sont renseignées par GitHub Actions lors du premier tag v1.0.0.",
+          "date": "2026-10-02T19:12:25Z",
           "downloadURL": "https://github.com/Nakirem/ClockWork/releases/download/v1.0.0/ClockWork-unsigned.ipa",
-          "size": 0,
+          "size": 1839182,
           "minOSVersion": "17.0"
         }
       ]
