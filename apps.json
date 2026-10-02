@@ -1,0 +1,34 @@
+{
+  "name": "ClockWork",
+  "identifier": "com.personal.ClockWork.source",
+  "userInfo": {
+    "subtitle": "Pointage personnel, sans compte",
+    "description": "Application iPhone de pointage personnel, en français, sans compte ni backend.",
+    "iconURL": "https://raw.githubusercontent.com/Nakirem/ClockWork/main/assets/icon.PNG",
+    "website": "https://github.com/Nakirem/ClockWork",
+    "tintColor": "#4F46D1"
+  },
+  "apps": [
+    {
+      "name": "ClockWork",
+      "bundleIdentifier": "com.personal.ClockWork",
+      "developerName": "Nakirem",
+      "subtitle": "Pointage personnel, sans compte",
+      "localizedDescription": "Pointage personnel en français : lieux, arrivées et départs manuels ou GPS, pauses, historique et statistiques. Sans compte ni backend, les données restent sur l'iPhone.",
+      "iconURL": "https://raw.githubusercontent.com/Nakirem/ClockWork/main/assets/icon.PNG",
+      "screenshotURLs": [],
+      "tintColor": "#4F46D1",
+      "versions": [
+        {
+          "version": "1.0",
+          "date": "2026-10-02T00:00:00Z",
+          "localizedDescription": "Première publication. La taille et la date réelles sont renseignées par GitHub Actions lors du premier tag v1.0.0.",
+          "downloadURL": "https://github.com/Nakirem/ClockWork/releases/download/v1.0.0/ClockWork-unsigned.ipa",
+          "size": 0,
+          "minOSVersion": "17.0"
+        }
+      ]
+    }
+  ],
+  "news": []
+}

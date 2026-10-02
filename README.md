@@ -12,13 +12,31 @@ Application iPhone native de pointage personnel, en français, sans compte ni ba
 4. Sur iPhone physique, sélectionner votre équipe dans **Signing & Capabilities**, choisir un identifiant de bundle personnel si nécessaire et activer le mode développeur de l’iPhone.
 5. Créer un lieu. Dans Réglages, autoriser la localisation pendant l’utilisation, puis Toujours ; activer Position précise et l’actualisation en arrière-plan. Les notifications sont facultatives et demandées séparément.
 
-Le pointage manuel fonctionne sans autorisation de localisation. Les tuiles Apple Plans nécessitent généralement un accès réseau ; les données de pointage et leurs calculs sont locaux. Aucun package tiers n’est requis par l’application. La signature personnelle peut être soumise aux limites Apple de votre compte. Une icône de distribution et les métadonnées App Store ne sont pas fournies : cette livraison cible l’usage personnel.
+Le pointage manuel fonctionne sans autorisation de localisation. Les tuiles Apple Plans nécessitent généralement un accès réseau ; les données de pointage et leurs calculs sont locaux. Aucun package tiers n’est requis par l’application. La signature personnelle peut être soumise aux limites Apple de votre compte. L’icône de l’app provient de `assets/icon.PNG` (compilée en `AppIcon` via le catalogue d’assets). Les métadonnées App Store ne sont pas fournies : cette livraison cible l’usage personnel.
+
+## AltStore Classic
+
+L’application est distribuable via **AltStore Classic**. La source du dépôt est servie à l’adresse :
+
+```
+https://raw.githubusercontent.com/Nakirem/ClockWork/main/apps.json
+```
+
+Dans AltStore Classic : **Sources → + → Ajouter une source**, coller cette URL. L’app ClockWork apparaît avec son icône ; AltStore la re-signe avec votre compte Apple au moment de l’installation (compte gratuit : signature à renouveler tous les 7 jours dans AltStore).
+
+**Publier une nouvelle version :**
+
+1. Augmenter `MARKETING_VERSION` dans `scripts/generate_project.py`, puis régénérer avec `python3 scripts/generate_project.py` (ou modifier `project.pbxproj` directement). AltStore détecte les mises à jour via ce numéro (`CFBundleShortVersionString`).
+2. Committer, puis pousser un tag `v*` (ex. `v1.1.0`) depuis `main` à jour.
+3. GitHub Actions compile l’IPA, le publie en release GitHub, puis met automatiquement à jour `apps.json` (version, URL, taille, date) et le pousse sur `main`.
+
+Le dépôt doit être **public** : AltStore télécharge `apps.json`, l’icône et l’IPA sans authentification.
 
 ## État de validation de cette livraison
 
 Le projet a été créé sur **Windows sans Swift ni SDK iOS**. Les contrôles de structure (références Xcode, présence des sources, plist, assets, schéma) sont exécutables ici. **La compilation iOS, les XCTest et la vérification visuelle sur simulateur/iPhone n’ont pas été exécutés dans cet environnement.** Il ne s’agit donc pas d’une compilation certifiée. Voir `docs/VALIDATION.md` pour les résultats locaux et le protocole appareil.
 
-La CI `.github/workflows/ios.yml` exécute `swift test`, les tests de packaging puis les tests de l’app sur un simulateur disponible. Sur un push ou lancement manuel réussi, elle produit ensuite une archive iPhone Release non signée et un IPA à récupérer dans les artefacts. Sur une pull request, seuls les tests sont exécutés. L’état d’un lancement distant doit être vérifié dans GitHub Actions ; l’existence de cette configuration ne prouve pas que le build a réussi. En local sur Mac :
+La CI `.github/workflows/ios.yml` exécute `swift test`, les tests de packaging puis les tests de l’app sur un simulateur disponible. Sur un push ou lancement manuel réussi, elle produit ensuite une archive iPhone Release non signée et un IPA à récupérer dans les artefacts. Sur un tag `v*`, l’IPA est aussi publié en release GitHub et la source AltStore `apps.json` est mise à jour puis poussée sur `main` automatiquement. Sur une pull request, seuls les tests sont exécutés. L’état d’un lancement distant doit être vérifié dans GitHub Actions ; l’existence de cette configuration ne prouve pas que le build a réussi. En local sur Mac :
 
 ```sh
 swift test
